@@ -1,0 +1,15 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "phpcs.standard": "WordPress",
+        "phpcbf.onsave": true,
+        "phpcbf.standard": "WordPress",
+        "[php]": {
+            "editor.wordSeparators": "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?"
+        },
+    }
+}
