@@ -32,7 +32,7 @@ class CouponNotificationEmail extends \WC_Email {
 		// set ID, this simply needs to be a unique name.
 		$this->id = 'lsx_cnw_coupon_notification';
 
-		// Is a customer email
+		// Is a customer email.
 		$this->customer_email = true;
 
 		// this is the title in WooCommerce Email settings.
@@ -67,7 +67,7 @@ class CouponNotificationEmail extends \WC_Email {
 	public static function get_instance() {
 
 		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
+		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
@@ -90,6 +90,7 @@ class CouponNotificationEmail extends \WC_Email {
 			'subject' => array(
 				'title'       => __( 'Email Subject' ),
 				'type'        => 'text',
+				/* translators: %s: default email subject */
 				'description' => sprintf( __( 'This controls the email subject line. Leave blank to use the default subject: <code>%s</code>.' ), $this->subject ),
 				'placeholder' => '',
 				'default'     => '',
@@ -97,6 +98,7 @@ class CouponNotificationEmail extends \WC_Email {
 			'heading' => array(
 				'title'       => __( 'Email Heading' ),
 				'type'        => 'text',
+				/* translators: %s: default email heading */
 				'description' => sprintf( __( 'This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>.' ), $this->heading ),
 				'placeholder' => '',
 				'default'     => '',
@@ -105,18 +107,18 @@ class CouponNotificationEmail extends \WC_Email {
 	}
 
 	/**
-	 * Determine if the email should actually be sent and setup email merge variables
+	 * Determine if the email should actually be sent and setup email merge variables.
 	 *
 	 * @since 0.1
-	 * @param int $order_id
+	 * @param int $order_id Order ID.
 	 */
 	public static function lsx_cnw_trigger( $order_id ) {
-		// bail if no order ID is present
+		// bail if no order ID is present.
 		if ( ! $order_id ) {
 			return;
 		}
 
-		// Send welcome email only once and not on every order status change
+		// Send welcome email only once and not on every order status change.
 		if ( ! get_post_meta( $order_id, 'lsx_cnw_coupon_notification_sent', true ) ) {
 			// setup order object.
 			$this->object = new WC_Order( $order_id );
@@ -141,16 +143,17 @@ class CouponNotificationEmail extends \WC_Email {
 			// woohoo, send the email!
 			$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
 
-			// add order note about the same
+			// add order note about the same.
+			/* translators: %s: order id */
 			$this->object->add_order_note( sprintf( __( 'Coupon notification email for order id %s was sent to the customer.' ), $order_id ) );
 
-			// Set order meta to indicate that the email was sent
+			// Set order meta to indicate that the email was sent.
 			update_post_meta( $this->object->id, 'lsx_cnw_coupon_notification_sent', 1 );
 		}
 	}
 
 	/**
-	 * get_content_html function.
+	 * Implementation of get_content_html function.
 	 *
 	 * @since 0.1
 	 * @return string
@@ -172,7 +175,7 @@ class CouponNotificationEmail extends \WC_Email {
 
 
 	/**
-	 * get_content_plain function.
+	 * Implementation of get_content_plain function.
 	 *
 	 * @since 0.1
 	 * @return string
