@@ -27,7 +27,7 @@ define( 'LSX_CNW_PATH', plugin_dir_path( __FILE__ ) );
 function lsx_cnw_add_coupon_notification_email( $email_classes ) {
 
 	// include our custom email class.
-	require_once 'classes/class-lsx-cnw-notification-email.php';
+	require_once 'classes/class-couponnotificationemail.php';
 
 	// add the email class to the list of email classes that WooCommerce loads.
 	$email_classes['CouponNotificationEmail'] = new lsx_cnw\classes\CouponNotificationEmail();
