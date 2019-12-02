@@ -31,7 +31,7 @@ function lsx_cnw_add_coupon_notification_email($email_classes)
     require_once 'classes/class-lsx-cnw-notification-email.php';
 
     // add the email class to the list of email classes that WooCommerce loads
-    $email_classes['LSX_CNW_Coupon_Notification_Email'] = new lsx_cnw\classes\LSX_CNW_Coupon_Notification_Email();
+    $email_classes['CouponNotificationEmail'] = new lsx_cnw\classes\CouponNotificationEmail();
 
     return $email_classes;
 }
