@@ -155,7 +155,7 @@ class CouponNotificationEmail extends \WC_Email {
 		// Send welcome email only once and not on every order status change.
 		if ( ! get_post_meta( $order_id, 'lsx_cnw_coupon_notification_sent', true ) ) {
 			// setup order object.
-			$this->object = new WC_Order( $order_id );
+			$this->object = new \WC_Order( $order_id );
 
 			// setup email recipient.
 			$this->recipient = $this->object->billing_email;
