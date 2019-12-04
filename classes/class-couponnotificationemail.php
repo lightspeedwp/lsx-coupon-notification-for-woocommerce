@@ -51,7 +51,7 @@ class CouponNotificationEmail extends \WC_Email {
 		$this->template_plain = 'emails/plain/lsx-coupon-notification.php';
 
 		// We tap into woocommerce_thankyou because coupon generation happens at woocommerce_before_thankyou.
-		add_action( 'woocommerce_thankyou', array( $this, 'lsx_cnw_trigger' ) );
+		add_action( 'woocommerce_thankyou', array( $this, 'trigger' ) );
 
 		// Call parent constructor to load any other defaults not explicity defined here.
 		parent::__construct();
@@ -81,13 +81,13 @@ class CouponNotificationEmail extends \WC_Email {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
-			'enabled' => array(
+			'enabled'            => array(
 				'title'   => __( 'Enable Notification' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable this email notification' ),
 				'default' => 'yes',
 			),
-			'subject' => array(
+			'subject'            => array(
 				'title'       => __( 'Email Subject' ),
 				'type'        => 'text',
 				/* translators: %s: default email subject */
@@ -95,7 +95,7 @@ class CouponNotificationEmail extends \WC_Email {
 				'placeholder' => '',
 				'default'     => '',
 			),
-			'heading' => array(
+			'heading'            => array(
 				'title'       => __( 'Email Heading' ),
 				'type'        => 'text',
 				/* translators: %s: default email heading */
@@ -103,8 +103,43 @@ class CouponNotificationEmail extends \WC_Email {
 				'placeholder' => '',
 				'default'     => '',
 			),
+			'additional_content' => array(
+				'title'       => __( 'Additional content' ),
+				'description' => __( 'Text to appear below the main email content.' ),
+				'css'         => 'width:400px; height: 75px;',
+				'placeholder' => __( 'N/A' ),
+				'type'        => 'textarea',
+				'default'     => '',
+				'desc_tip'    => true,
+			),
+			'email_type'         => array(
+				'title'       => __( 'Email type' ),
+				'type'        => 'select',
+				'description' => __( 'Choose which format of email to send.' ),
+				'default'     => 'html',
+				'class'       => 'email_type wc-enhanced-select',
+				'options'     => $this->get_email_type_options(),
+				'desc_tip'    => true,
+			),
 		);
 	}
+
+	/**
+	 * Email type options.
+	 *
+	 * @return array
+	 */
+	public function get_email_type_options() {
+		$types = array( 'plain' => __( 'Plain text' ) );
+
+		if ( class_exists( 'DOMDocument' ) ) {
+			$types['html']      = __( 'HTML' );
+			$types['multipart'] = __( 'Multipart' );
+		}
+
+		return $types;
+	}
+
 
 	/**
 	 * Determine if the email should actually be sent and setup email merge variables.
@@ -112,12 +147,11 @@ class CouponNotificationEmail extends \WC_Email {
 	 * @since 0.1
 	 * @param int $order_id Order ID.
 	 */
-	public static function lsx_cnw_trigger( $order_id ) {
+	public function trigger( $order_id ) {
 		// bail if no order ID is present.
 		if ( ! $order_id ) {
 			return;
 		}
-
 		// Send welcome email only once and not on every order status change.
 		if ( ! get_post_meta( $order_id, 'lsx_cnw_coupon_notification_sent', true ) ) {
 			// setup order object.
