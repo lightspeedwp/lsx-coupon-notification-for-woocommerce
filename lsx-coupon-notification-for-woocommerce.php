@@ -34,5 +34,16 @@ function lsx_cnw_add_coupon_notification_email( $email_classes ) {
 
 	return $email_classes;
 }
-
 add_filter( 'woocommerce_email_classes', 'lsx_cnw_add_coupon_notification_email' );
+
+/**
+ *  Initiates the WC Mailer to trigger the coupon notification
+ *
+ * @return void
+ */
+function lsx_cnw_initiate_wc_mailer() {
+	if ( function_exists( 'WC' ) ) {
+		$mailer = WC()->mailer();
+	}
+}
+add_filter( 'woocommerce_before_thankyou', 'lsx_cnw_initiate_wc_mailer', 1 );
