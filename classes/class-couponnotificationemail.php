@@ -158,14 +158,14 @@ class CouponNotificationEmail extends \WC_Email {
 			$this->object = new \WC_Order( $order_id );
 
 			// setup email recipient.
-			$this->recipient = $this->object->billing_email;
+			$this->recipient = $this->object->get_billing_email();
 
 			// get order items as array.
 			$order_items = $this->object->get_items();
 
 			// replace variables in the subject/headings.
 			$this->find[]    = '{order_date}';
-			$this->replace[] = date_i18n( woocommerce_date_format(), strtotime( $this->object->order_date ) );
+			$this->replace[] = date_i18n( woocommerce_date_format(), strtotime( $this->object->get_date_paid() ) );
 
 			$this->find[]    = '{order_number}';
 			$this->replace[] = $this->object->get_order_number();
@@ -182,7 +182,7 @@ class CouponNotificationEmail extends \WC_Email {
 			$this->object->add_order_note( sprintf( __( 'Coupon notification email for order id %s was sent to the customer.' ), $order_id ) );
 
 			// Set order meta to indicate that the email was sent.
-			update_post_meta( $this->object->id, 'lsx_cnw_coupon_notification_sent', 1 );
+			update_post_meta( $this->object->get_id(), 'lsx_cnw_coupon_notification_sent', 1 );
 		}
 	}
 
