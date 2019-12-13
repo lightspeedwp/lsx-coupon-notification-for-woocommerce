@@ -41,14 +41,17 @@ class CouponNotificationEmail extends \WC_Email {
 		// this is the description in WooCommerce email settings.
 		$this->description = __( 'Coupon Notification Email sent to WooCommerce clients who subscribed to either Monthly or Annual subscription.' );
 
+		// For admin area to let the user know we are sending this email to customers.
+		$this->customer_email = true;
+
 		// these are the default heading and subject lines that can be overridden using the settings.
 		$this->heading = __( 'New Coupon from RW Plus!' );
 		$this->subject = __( 'You have a new coupon from RW Plus.' );
 
 		// these define the locations of the templates that this email should use, we'll just use the new order template since this email is similar.
-		$this->template_base  = LSX_CNW_PATH . 'templates/';
 		$this->template_html  = 'emails/lsx-coupon-notification.php';
 		$this->template_plain = 'emails/plain/lsx-coupon-notification.php';
+		$this->template_base  = LSX_CNW_PATH . 'templates/';
 
 		// We tap into woocommerce_thankyou because coupon generation happens at woocommerce_before_thankyou.
 		add_action( 'woocommerce_thankyou', array( $this, 'trigger' ) );
@@ -134,7 +137,7 @@ class CouponNotificationEmail extends \WC_Email {
 
 		if ( class_exists( 'DOMDocument' ) ) {
 			$types['html']      = __( 'HTML' );
-			$types['multipart'] = __( 'Multipart' );
+			// $types['multipart'] = __( 'Multipart' );
 		}
 
 		return $types;
@@ -193,18 +196,13 @@ class CouponNotificationEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_html() {
-		ob_start();
-		woocommerce_get_template(
-			$this->template_html,
-			array(
-				'order'         => $this->object,
-				'email_heading' => $this->get_heading(),
-				'sent_to_admin' => false,
-				'plain_text'    => false,
-				'email'         => $this,
-			)
-		);
-		return ob_get_clean();
+		return wc_get_template_html( $this->template_html, array(
+			'order'         => $this->object,
+			'email_heading' => $this->get_heading(),
+			'sent_to_admin' => false,
+			'plain_text'    => false,
+			'email'			=> $this
+		), '', $this->template_base );
 	}
 
 
@@ -215,17 +213,12 @@ class CouponNotificationEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain() {
-		ob_start();
-		woocommerce_get_template(
-			$this->template_plain,
-			array(
-				'order'         => $this->object,
-				'email_heading' => $this->get_heading(),
-				'sent_to_admin' => false,
-				'plain_text'    => true,
-				'email'         => $this,
-			)
-		);
-		return ob_get_clean();
+		return wc_get_template_html( $this->template_plain, array(
+			'order'         => $this->object,
+			'email_heading' => $this->get_heading(),
+			'sent_to_admin' => false,
+			'plain_text'    => true,
+			'email'			=> $this
+		), '', $this->template_base );
 	}
 } // end \WC_Coupon_Notification_Email class
