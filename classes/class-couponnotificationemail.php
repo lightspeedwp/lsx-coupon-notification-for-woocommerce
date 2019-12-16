@@ -136,7 +136,7 @@ class CouponNotificationEmail extends \WC_Email {
 		$types = array( 'plain' => __( 'Plain text' ) );
 
 		if ( class_exists( 'DOMDocument' ) ) {
-			$types['html']      = __( 'HTML' );
+			$types['html'] = __( 'HTML' );
 			// $types['multipart'] = __( 'Multipart' );
 		}
 
@@ -182,11 +182,27 @@ class CouponNotificationEmail extends \WC_Email {
 
 			// add order note about the same.
 			/* translators: %s: order id */
-			$this->object->add_order_note( sprintf( __( 'Coupon notification email for order id %s was sent to the customer.' ), $order_id ) );
+			$this->object->add_order_note( sprintf( __( 'Coupon notification email for order id %1$s was sent to the customer.' ), $order_id ) );
 
 			// Set order meta to indicate that the email was sent.
 			update_post_meta( $this->object->get_id(), 'lsx_cnw_coupon_notification_sent', 1 );
 		}
+	}
+
+	function custom_get_order_notes( $order_id ) {
+		remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
+		$comments = get_comments(
+			array(
+				'post_id' => $order_id,
+				'orderby' => 'comment_ID',
+				'order'   => 'DESC',
+				'approve' => 'approve',
+				'type'    => 'order_note',
+			)
+		);
+		$notes    = wp_list_pluck( $comments, 'comment_content' );
+		add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
+		return $notes;
 	}
 
 	/**
@@ -196,13 +212,23 @@ class CouponNotificationEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_html() {
-		return wc_get_template_html( $this->template_html, array(
-			'order'         => $this->object,
-			'email_heading' => $this->get_heading(),
-			'sent_to_admin' => false,
-			'plain_text'    => false,
-			'email'			=> $this
-		), '', $this->template_base );
+		$order_id = $this->object->get_id();
+
+		return wc_get_template_html(
+			$this->template_html,
+			array(
+				'order'              => $this->object,
+				'email_heading'      => $this->get_heading(),
+				'additional_content' => $this->get_additional_content(),
+				'customer_note'      => $this->custom_get_order_notes( $order_id ),
+				'coupon'             => get_post_meta( $order_id, 'lsx_cew_coupon_code', true ),
+				'sent_to_admin'      => false,
+				'plain_text'         => false,
+				'email'              => $this,
+			),
+			'',
+			$this->template_base
+		);
 	}
 
 
@@ -213,12 +239,22 @@ class CouponNotificationEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain() {
-		return wc_get_template_html( $this->template_plain, array(
-			'order'         => $this->object,
-			'email_heading' => $this->get_heading(),
-			'sent_to_admin' => false,
-			'plain_text'    => true,
-			'email'			=> $this
-		), '', $this->template_base );
+		$order_id = $this->object->get_id();
+
+		return wc_get_template_html(
+			$this->template_plain,
+			array(
+				'order'              => $this->object,
+				'email_heading'      => $this->get_heading(),
+				'additional_content' => $this->get_additional_content(),
+				'customer_note'      => $this->custom_get_order_notes( $order_id ),
+				'coupon'             => get_post_meta( $order_id, 'lsx_cew_coupon_code', true ),
+				'sent_to_admin'      => false,
+				'plain_text'         => true,
+				'email'              => $this,
+			),
+			'',
+			$this->template_base
+		);
 	}
 } // end \WC_Coupon_Notification_Email class
