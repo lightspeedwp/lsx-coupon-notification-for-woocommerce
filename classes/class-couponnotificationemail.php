@@ -54,7 +54,8 @@ class CouponNotificationEmail extends \WC_Email {
 		$this->template_base  = LSX_CNW_PATH . 'templates/';
 
 		// We tap into woocommerce_thankyou because coupon generation happens at woocommerce_before_thankyou.
-		add_action( 'woocommerce_thankyou', array( $this, 'trigger' ) );
+		// add_action( 'woocommerce_thankyou', array( $this, 'trigger' ) );
+		add_action( 'woocommerce_order_status_completed', array( $this, 'trigger' ) );
 
 		// Call parent constructor to load any other defaults not explicity defined here.
 		parent::__construct();
