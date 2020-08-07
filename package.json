@@ -42,7 +42,7 @@
     "extend": "^3.0.2",
     "fstream": "^1.0.12",
     "lodash": "^4.17.19",
-    "minimatch": "^3.0.2",
+    "minimatch": "^3.0.4",
     "set-value": "^3.0.2",
     "shelljs": "^0.8.4",
     "tar": "^6.0.2"
